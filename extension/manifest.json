@@ -1,0 +1,28 @@
+{
+    "manifest_version": 3,
+    "name": "Scam Shield",
+    "version": "1.0",
+    "description": "A user-friendly extension to protect against scams and phishing attempts.",
+    "permissions": [
+        "storage",
+        "activeTab"
+    ],
+    "host_permissions": [
+        "https://mail.google.com/*"
+    ],
+    "content_scripts": [
+        {
+            "matches": ["https://mail.google.com/*"],
+            "js": ["content.js"]
+        }
+    ],
+    "action": {
+        "default_popup": ["popup/popup.html"],
+        "default_title": "Scam Shield"
+    },
+    "icons": {
+        "16": "icons/icon16.png",
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
+    }
+}
