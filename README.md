@@ -1,7 +1,7 @@
 # Mail Scam Checker (Chrome Extension)
 
 A Chrome extension that helps detect potential email scams by analyzing patterns commonly found in phishing and scam messages.
-This group project includes creating a Google Chrome Extension to read various emails, check whether they are suspicious or not, then give the user warning messages depending on how dangerous the emai is. Our program will be able to check files and common mistakes in dangerous emails used to steal users information or for hacking. This will help users recognize phishing and scams by relaying either a low, medium, or high warning level.
+This group project includes creating a Google Chrome Extension to read various emails, check whether they are suspicious or not, then give the user warning messages depending on how dangerous the email is. Our program will be able to check files and common mistakes in dangerous emails used to steal users information or for hacking. This will help users recognize phishing and scams by relaying either a low, medium, or high warning level.
 
 # How It Works
   The extension will immediately search for frequent risk factors found in emails once they are opened. This includes searching for suspicious links, urging and/or convincing language, unknown senders, and
@@ -14,7 +14,7 @@ is safe, a safe pop-up will appear.
   # Stored Content
     We will not store, transmit, or sell any user data and all evaluations of emails will be in the local browser currently being used. 
   # Why We Need Permissions
-    We must use these permissions in order to fully scan recieved emails to determine it's safetly level as well as to support the browser that the user utilises.
+    We must use these permissions in order to fully scan recieved emails to determine it's safetly level as well as to support the browser that the user utilizes.
 
 # Permissions Used
   The permissions used will include the active Gmail tab, scripting to detect information on the users page, and various host_permissions such as specific email platforms like Gmail. We follow the Least 
