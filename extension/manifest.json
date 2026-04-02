@@ -1,6 +1,6 @@
 {
     "manifest_version": 3,
-    "name": "Scam Shield",
+    "name": "PufferPhish",
     "version": "1.0",
     "description": "A user-friendly extension to protect against scams and phishing attempts.",
     "permissions": [
@@ -18,7 +18,7 @@
     ],
     "action": {
         "default_popup": "popup/popup.html",
-        "default_title": "Scam Shield"
+        "default_title": "PufferPhish"
     },
     "icons": {
         "16": "icons/icon16.png",
