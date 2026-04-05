@@ -17,6 +17,9 @@
             "js": ["content.js"]
         }
     ],
+    "background": {
+        "service_worker": "background.js"
+    },
     "action": {
         "default_popup": "popup/popup.html",
         "default_title": "PufferPhish"
