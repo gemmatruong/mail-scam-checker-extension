@@ -32,41 +32,46 @@ chrome.runtime.onMessage.addListener((message) => {
         return;
     }
 
-    const { emailBody, senderEmail } = message.payload;
+    const { emailBody, senderEmail, senderName } = message.payload;
+    
+    // Avoid case-sensitivity
+    const bodyLower  = emailBody.toLowerCase();
+    const emailLower = senderEmail.toLowerCase();
+    const nameLower  = senderName.toLowerCase();
 
     let score = 0;
-    let detectedTactic = "None detected";
-    let description = "No obvious scam signals were found in this email.";
-    let recommendation = "Safe to proceed.";
+    const tactics      = [];
+    const descriptions = [];
 
-    // Simple phishing logic.
-    const foundKeywords = SUSPICIOUS_KEYWORDS.filter((word) => emailBody.toLowerCase().includes(word));
+    // Suspicious languages: check for suspicious keywords in email body
+    const foundKeywords = SUSPICIOUS_KEYWORDS.filter((word) => bodyLower.includes(word));
 
     if (foundKeywords.length > 0) {
-        const keywordScore = Math.min(foundKeywords.length * 10, 40);
-        score += keywordScore;
-        detectedTactic = "Suspicious Language";
-        description = `Found ${foundKeywords.length} suspicious keyword(s): ${foundKeywords.join(", ")}.`;
+        score += Math.min(foundKeywords.length * 10, 40);
+        tactics.push("Suspicious Language");
+        descriptions.push(`Found ${foundKeywords.length} suspicious keyword(s): ${foundKeywords.join(", ")}.`);
     }
 
-    // Impersonation check: looks for "google" in the address without the official domain.
-    if (senderEmail.includes("google") && !senderEmail.endsWith("@google.com")) {
-        score += 40;
-        detectedTactic = "Impersonation";
-        description = "The sender appears to reference Google without using an official @google.com address.";
+    // Impersonation check: looks for brand name in the address without the official domain.
+    for (const [brand, officialDomain] of Object.entries(KNOWN_BRANDS)) {
+        if (nameLower.includes(brand) && !emailLower.endsWith(`@${officialDomain}`))
+        {
+            score += 40;
+            tactics.push("Brand Impersonation");
+            descriptions.push(`Sender claims to be "${brand}" but is not from @${officialDomain}.`)
+        }
     }
 
     // Cap the score at 100.
     score = Math.min(score, 100);
 
-    // Recommendations based on risk scores
-    if (score < 30) {
-        recommendation = "No major warning signs detected, but stay alert.";
-    } else if (score < 65) {
-        recommendation = "Medium Risk! Be cautious. Double-check the sender and inspect links before taking action.";
-    } else {
-        recommendation = "High Risk!!! Do not click links or open attachments. Verify the sender independently.";
-    }
+    let recommendation;
+    if (score < 30)       recommendation = "No major warning signs detected, but stay alert.";
+    else if (score < 65)  recommendation = "Be cautious. Double-check the sender and inspect links before taking action.";
+    else                  recommendation = "Do not click links or open attachments. Verify the sender independently.";
+
+    const detectedTactic = tactics.length      > 0 ? tactics.join(", ")      : "None detected";
+    const description    = descriptions.length > 0 ? descriptions.join(" ")  : "No obvious scam signals were found in this email.";
 
     // Save the data to storage so the popup can see it.
     chrome.storage.local.set({
