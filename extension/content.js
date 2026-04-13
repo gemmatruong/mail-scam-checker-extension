@@ -2,13 +2,22 @@
 let analyzeTimer = null;
 let lastAnalyzedSignature = "";
 
+// Clear data when no email is open. 
+const clearRiskData = () => {
+    lastAnalyzedSignature = "";
+    chrome.storage.local.remove("riskData");
+};
+
+
 // This function runs whenever the page content changes (like opening a new email).
 const analyzeEmail = () => {
     // Grab the email body and sender after Gmail has rendered the active message.
     const emailBody = document.querySelector('.a3s.aiL')?.innerText?.trim() || "";
     const senderEmail = document.querySelector('.gD')?.getAttribute('email') || "";
+    const senderName = document.querySelector('.gD')?.getAttribute('name') || "";
 
     if (!emailBody && !senderEmail) {
+        clearRiskData();
         return;
     }
 
@@ -22,7 +31,7 @@ const analyzeEmail = () => {
     // Send extracted data to background.js for analysis.
     chrome.runtime.sendMessage({
         type: "ANALYZE_EMAIL",
-        payload: { emailBody, senderEmail }
+        payload: { emailBody, senderEmail, senderName }
     });
 };
 
