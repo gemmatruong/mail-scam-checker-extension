@@ -1,24 +1,42 @@
-// Added: centralize popup rendering so we can update both on open and on storage changes.
+/**
+ * popup.js
+ * Renders the popup view for the most recent Gmail analysis.
+ *
+ * The popup reads `riskData` from extension storage when it opens and also
+ * listens for storage updates so the UI refreshes if a new email is analyzed
+ * while the popup is already visible.
+ */
+
+
 const renderRiskData = (data) => {
+  const hasData = Boolean(data);
+
   document.getElementById('risk-score').textContent =
-    data ? `Risk Score: ${data.score}/100` : "Risk Score: --";
+    hasData ? `Risk Score: ${data.score}/100` : 'Risk Score: --';
 
-  document.getElementById('tactic').textContent =
-    data ? `Phishing tactic: ${data.tactic}` : "Phishing tactic: Not analyzed yet";
-
-  document.getElementById('description').textContent =
-    data ? `Details: ${data.description}` : "Open an email in Gmail to analyze it.";
+  // Show a bullet-style list when multiple tactics were detected.
+  const tacticEl = document.getElementById('tactic');
+  if (hasData && data.tactic !== 'None detected') {
+    tacticEl.innerHTML =
+      'Phishing tactic(s):<br>' +
+      data.tactic.split(', ').map((tactic) => `&bull; ${tactic}`).join('<br>');
+  } else {
+    tacticEl.textContent = hasData
+      ? 'Phishing tactic: None detected'
+      : 'Phishing tactic: Not analyzed yet';
+  }
 
   document.getElementById('recommendation').textContent =
-    data ? `Recommendation: ${data.recommendation}` : "";
+    hasData ? `Recommendation: ${data.recommendation}` : '';
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Load whatever result is already stored when the popup opens.
   chrome.storage.local.get(['riskData'], (result) => {
     renderRiskData(result.riskData);
   });
 
-  // Added: refresh the popup immediately when content.js writes a new score.
+  // Keep the popup in sync if a new Gmail message is analyzed live.
   chrome.storage.onChanged.addListener((changes, areaName) => {
     if (areaName !== 'local' || !changes.riskData) {
       return;

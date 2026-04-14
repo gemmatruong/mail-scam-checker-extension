@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "PufferPhish",
     "version": "1.0",
-    "description": "A user-friendly extension to protect against scams and phishing attempts.",
+    "description": "A Chrome extension to detect and warn users about potential phishing emails in Gmail.",
     "permissions": [
         "storage",
         "activeTab",
