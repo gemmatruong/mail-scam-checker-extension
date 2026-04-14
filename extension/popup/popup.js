@@ -1,65 +1,42 @@
-let detailsExpanded = false;
-let detailsToggle;
-let detailsPanel;
+/**
+ * popup.js
+ * Renders the popup view for the most recent Gmail analysis.
+ *
+ * The popup reads `riskData` from extension storage when it opens and also
+ * listens for storage updates so the UI refreshes if a new email is analyzed
+ * while the popup is already visible.
+ */
 
-const syncDetailsView = (hasData) => {
-  detailsPanel.classList.toggle('hidden', !detailsExpanded);
-  detailsToggle.disabled = !hasData;
-};
 
-// Added: centralize popup rendering so we can update both on open and on storage changes.
 const renderRiskData = (data) => {
   const hasData = Boolean(data);
 
   document.getElementById('risk-score').textContent =
-    hasData ? `Risk Score: ${data.score}/100` : "Risk Score: --";
+    hasData ? `Risk Score: ${data.score}/100` : 'Risk Score: --';
 
+  // Show a bullet-style list when multiple tactics were detected.
   const tacticEl = document.getElementById('tactic');
-  if (hasData && data.tactic !== "None detected") {
-    tacticEl.innerHTML = "Phishing tactic(s):<br>" +
-      data.tactic.split(", ").map(t => `• ${t}`).join("<br>");
+  if (hasData && data.tactic !== 'None detected') {
+    tacticEl.innerHTML =
+      'Phishing tactic(s):<br>' +
+      data.tactic.split(', ').map((tactic) => `&bull; ${tactic}`).join('<br>');
   } else {
-    tacticEl.textContent = hasData ? "Phishing tactic: None detected" : "Phishing tactic: Not analyzed yet";
-  }
-
-  const descEl = document.getElementById('description');
-  if (hasData && data.description !== "No obvious scam signals were found in this email.") {
-    const bullets = data.description
-      .split(/(?<=\.)\s+/)
-      .filter(s => s.trim());
-    descEl.innerHTML = bullets.map(b => `<li>${b}</li>`).join("");
-  } else {
-    descEl.innerHTML = `<li>${hasData ? "No obvious scam signals were found." : "Open an email in Gmail to analyze it."}</li>`;
+    tacticEl.textContent = hasData
+      ? 'Phishing tactic: None detected'
+      : 'Phishing tactic: Not analyzed yet';
   }
 
   document.getElementById('recommendation').textContent =
-    hasData ? `Recommendation: ${data.recommendation}` : "";
-
-  if (!hasData) {
-    detailsExpanded = false;
-  }
-
-  syncDetailsView(hasData);
+    hasData ? `Recommendation: ${data.recommendation}` : '';
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-  detailsToggle = document.getElementById('details-toggle');
-  detailsPanel = document.getElementById('details-panel');
-
-  detailsToggle.addEventListener('click', () => {
-    if (detailsToggle.disabled) {
-      return;
-    }
-
-    detailsExpanded = !detailsExpanded;
-    syncDetailsView(true);
-  });
-
+  // Load whatever result is already stored when the popup opens.
   chrome.storage.local.get(['riskData'], (result) => {
     renderRiskData(result.riskData);
   });
 
-  // Added: refresh the popup immediately when content.js writes a new score.
+  // Keep the popup in sync if a new Gmail message is analyzed live.
   chrome.storage.onChanged.addListener((changes, areaName) => {
     if (areaName !== 'local' || !changes.riskData) {
       return;

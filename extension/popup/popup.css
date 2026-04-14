@@ -56,10 +56,11 @@ body {
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
   text-align: center;
 }
-#tactic, #description {
-    color: #f179ede1;
-  font-size: 14px;
+#tactic {
+  color: #f179ede1;
+  font-size: 16px;
   text-align: center;
+  margin: 10px;
 }
 
 .popup-three {
@@ -67,6 +68,7 @@ body {
   border-radius: 15px;
   padding: 10px;
   margin: 5px;
+  margin-bottom: 20px;
  /* background: #ffffff; */
   
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
