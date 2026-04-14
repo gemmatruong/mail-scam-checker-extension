@@ -32,7 +32,7 @@ chrome.runtime.onMessage.addListener((message) => {
         return;
     }
 
-    const { emailBody, senderEmail, senderName } = message.payload;
+    const { emailBody, senderEmail, senderName, links } = message.payload;
     
     // Avoid case-sensitivity
     const bodyLower  = emailBody.toLowerCase();
@@ -60,6 +60,43 @@ chrome.runtime.onMessage.addListener((message) => {
             tactics.push("Brand Impersonation");
             descriptions.push(`Sender claims to be "${brand}" but is not from @${officialDomain}.`)
         }
+    }
+
+    // Check for suspicious link
+    // Link pointing to a raw IP address
+    const IP_PATTERN = /^https?:\/\/\d{1,3}(\.\d{1,3}){3}/;
+    const ipLinks    = links.filter(l => IP_PATTERN.test(l.href));
+
+    if (ipLinks.length > 0) {
+        score += 25;
+        tactics.push("Suspicious Link Destination");
+        descriptions.push(`A link points to a raw IP address: ${ipLinks[0].href}`);
+    }
+
+    // Shorten links
+    const SHORTENERS = ["bit.ly", "tinyurl.com", "t.co", "cutt.ly"];
+    const shortenedLinks = links.filter(l => SHORTENERS.some(s => l.href.includes(s)));
+
+    if (shortenedLinks.length > 0) {
+        score += 15;
+        tactics.push("Shortened Link");
+        descriptions.push("A shortened URL was found — the real destination is hidden.");
+    }
+
+    // Visible URL text doesn't match the actual href destination.
+    const mismatchedLinks = links.filter(l => {
+        if (!/^https?:\/\//i.test(l.text.trim())) return false;
+        try {
+            return new URL(l.text.trim()).hostname !== new URL(l.href).hostname;
+        } catch {
+            return false;
+        }
+    });
+
+    if (mismatchedLinks.length > 0) {
+        score += 30;
+        tactics.push("Link Mismatch");
+        descriptions.push("A link's visible URL does not match its actual destination.");
     }
 
     // Cap the score at 100.
