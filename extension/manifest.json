@@ -4,9 +4,7 @@
     "version": "1.0",
     "description": "A Chrome extension to detect and warn users about potential phishing emails in Gmail.",
     "permissions": [
-        "storage",
-        "activeTab",
-        "scripting"
+        "storage"
     ],
     "host_permissions": [
         "https://mail.google.com/*"
@@ -17,9 +15,6 @@
             "js": ["content.js"]
         }
     ],
-    "background": {
-        "service_worker": "background.js"
-    },
     "action": {
         "default_popup": "popup/popup.html",
         "default_title": "PufferPhish"
