@@ -17,7 +17,7 @@ is safe, a safe pop-up will appear.
     We must use these permissions in order to fully scan recieved emails to determine it's safetly level as well as to support the browser that the user utilizes.
 
 # Permissions Used
-  The permissions used will include the active Gmail tab, scripting to detect information on the users page, and various host_permissions such as specific email platforms like Gmail. We follow the Least 
+  The permissions used include local storage for the latest scan result and Gmail host access so the content script can analyze opened messages directly on the page. We follow the Least 
 Privilege Principle layout, using permissions that is absolutely neccessary. No background data or full browsing history would ever be requested. 
 
 # Warning Messages
